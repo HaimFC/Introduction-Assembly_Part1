@@ -1,0 +1,50 @@
+#include <msp430xG46x.h>    
+          ORG 1100h
+Id1      DW    0, 5, 9, 3, 6, 1, 9, 8
+Id2      DW    0, 7, 0, 7, 0, 1, 5, 2
+Size     DW    8 
+Modu     DW    00000001b
+MinEven  DS16  8 
+
+          RSEG   CODE                        
+                    
+Main      MOV  #Id1,R5
+          MOV  #Id2,R6
+          MOV  #MinEven,R11         
+          MOV  Size, R10
+Again          
+	  MOV  @R5, R7
+	  MOV  @R6, R8
+          MOV  R7, R12
+	  MOV  R8, R13 
+          AND  Modu,R7 
+          CMP  Modu, R7
+	  JGE  OddNum
+	  AND  Modu,R8 
+	  CMP  Modu, R8
+	  JGE  OddNum
+	  CMP  R12, R13
+	  JGE  Bigger  	
+          MOV  R13, R9	    
+          JMP  AddArray			
+OddNum      
+	  MOV  #0, R9
+          JMP  AddArray
+Bigger    
+	  MOV  R12, R9
+AddArray
+	  MOV  R9, 0(R11)
+	  INCD R11	 
+	  INCD R5
+          INCD R6
+	  DEC  R10     
+          JNZ  Again
+	          
+L         JMP  L          
+          NOP
+;-------------------------------------------------------------------------------
+          COMMON  INTVEC                  ; Interrupt Vectors
+;-------------------------------------------------------------------------------
+          ORG     RESET_VECTOR            ; POR, ext. Reset
+          DW      Main
+          END
